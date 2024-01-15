@@ -38,7 +38,6 @@ return {
 			opts.desc = "See available code actions"
 			keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
 		end
-		--vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 		local sign = function(opt)
@@ -49,10 +48,18 @@ return {
 			})
 		end
 
-		sign({ name = "DiagnosticSignError", text = "" })
-		sign({ name = "DiagnosticSignWarn", text = "" })
-		sign({ name = "DiagnosticSignHint", text = "" })
-		sign({ name = "DiagnosticSignInfo", text = "" })
+		if vim.fn.has('macunix')
+		then
+			sign({ name = "DiagnosticSignError", text = "◉" })
+			sign({ name = "DiagnosticSignWarn", text = "" })
+			sign({ name = "DiagnosticSignHint", text = "⚡︎" })
+			sign({ name = "DiagnosticSignInfo", text = "" })
+		else
+			sign({ name = "DiagnosticSignError", text = "" })
+			sign({ name = "DiagnosticSignWarn", text = "" })
+			sign({ name = "DiagnosticSignHint", text = "" })
+			sign({ name = "DiagnosticSignInfo", text = "" })
+		end
 
 		vim.diagnostic.config({
 			virtual_text = false,
