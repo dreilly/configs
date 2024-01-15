@@ -38,21 +38,21 @@ return {
 			opts.desc = "See available code actions"
 			keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
 		end
-		vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
+		--vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 		local sign = function(opt)
 			vim.fn.sign_define(opt.name, {
 				texthl = opt.name,
 				text = opt.text,
-				numhl = ''
+				numhl = "",
 			})
 		end
 
-		sign({ name = 'DiagnosticSignError', text = '' })
-		sign({ name = 'DiagnosticSignWarn', text = '' })
-		sign({ name = 'DiagnosticSignHint', text = '' })
-		sign({ name = 'DiagnosticSignInfo', text = '' })
+		sign({ name = "DiagnosticSignError", text = "" })
+		sign({ name = "DiagnosticSignWarn", text = "" })
+		sign({ name = "DiagnosticSignHint", text = "" })
+		sign({ name = "DiagnosticSignInfo", text = "" })
 
 		vim.diagnostic.config({
 			virtual_text = false,
@@ -61,10 +61,10 @@ return {
 			underline = true,
 			severity_sort = false,
 			float = {
-				border = 'single',
-				source = 'always',
-				header = '',
-				prefix = '',
+				border = "single",
+				source = "always",
+				header = "",
+				prefix = "",
 			},
 		})
 
@@ -79,10 +79,10 @@ return {
 			settings = {
 				Lua = {
 					runtime = {
-						version = 'LuaJIT',
+						version = "LuaJIT",
 					},
 					diagnostics = {
-						globals = { 'vim' },
+						globals = { "vim" },
 					},
 					workspace = {
 						library = {
@@ -97,64 +97,66 @@ return {
 			},
 		})
 
-		lspconfig['rust_analyzer'].setup({
+		lspconfig["rust_analyzer"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
 			cmd = {
-				"rustup", "run", "stable", "rust-analyzer",
+				"rustup",
+				"run",
+				"stable",
+				"rust-analyzer",
 			},
 			settings = {
-				['rust-analyzer'] = {
+				["rust-analyzer"] = {
 					diagnostics = false,
-				}
-			}
-
+				},
+			},
 		})
 
 		vim.g.markdown_fenced_languages = {
-			"ts=typescript"
+			"ts=typescript",
 		}
 
 		-- deno language server
-		lspconfig['denols'].setup({
+		lspconfig["denols"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
-			root_dir = lspconfig['util'].root_pattern("deno.json", "deno.jsonc")
+			root_dir = lspconfig["util"].root_pattern("deno.json", "deno.jsonc"),
 		})
 
 		-- typescript language server
-		lspconfig['tsserver'].setup({
+		lspconfig["tsserver"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
-			root_dir = lspconfig['util'].root_pattern("package.json")
+			root_dir = lspconfig["util"].root_pattern("package.json"),
 		})
 
 		-- tailwind language server
-		lspconfig['tailwindcss'].setup({
+		lspconfig["tailwindcss"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
 		})
 
 		-- prisma language server
-		lspconfig['prismals'].setup({
+		lspconfig["prismals"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
 		})
 
 		-- css language server
-		lspconfig['cssls'].setup({
+		lspconfig["cssls"].setup({
 			capabilities = capabilities,
-			on_attach = on_attach
+			on_attach = on_attach,
 		})
 
 		-- go language server
-		lspconfig['gopls'].setup({
+		lspconfig["gopls"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
 		})
 
 		-- vue language server
-		lspconfig['volar'].setup({
+		lspconfig["volar"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
 		})
