@@ -11,8 +11,6 @@ return {
 				enable = true,
 				additional_vim_regex_highlighting = false,
 			},
-			file_ignore_patterns = { "node_modules", "plugged" },
-			find_command = { 'rg', '--files', '--iglob', '!.git', '--hidden' },
 		})
 	end,
 }
