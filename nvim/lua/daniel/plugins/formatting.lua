@@ -31,7 +31,6 @@ return {
 				async = false,
 				timeout_ms = 500,
 			})
-			print("yayayayaya")
 		end, { desc = "Format file (or range)" })
 	end,
 }
