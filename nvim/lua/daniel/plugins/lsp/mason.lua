@@ -21,6 +21,7 @@ return {
 				"volar",
 				"pyright",
 				"html",
+				"volar",
 			},
 			automatic_installation = true,
 		})
