@@ -21,7 +21,7 @@ return {
 				"volar",
 				"pyright",
 				"html",
-				"volar",
+				"volar@1.8.4",
 			},
 			automatic_installation = true,
 		})

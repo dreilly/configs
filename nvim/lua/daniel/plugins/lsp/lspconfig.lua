@@ -48,8 +48,7 @@ return {
 			})
 		end
 
-		if vim.fn.has('macunix')
-		then
+		if vim.fn.has("macunix") then
 			sign({ name = "DiagnosticSignError", text = "◉" })
 			sign({ name = "DiagnosticSignWarn", text = "" })
 			sign({ name = "DiagnosticSignHint", text = "⚡︎" })
@@ -137,6 +136,26 @@ return {
 			on_attach = on_attach,
 			root_dir = lspconfig["util"].root_pattern("package.json"),
 		})
+		--
+		--lspconfig["tsserver"].setup({
+		--	capabilities = capabilities,
+		--	on_attach = on_attach,
+		--	root_dir = lspconfig["util"].root_pattern("package.json"),
+		--	init_options = {
+		--		plugins = {
+		--			{
+		--				name = "@vue/typescript-plugin",
+		--				location = "/usr/local/lib/node_modules/@vue/typescript-plugin",
+		--				languages = { "typescript", "vue" },
+		--			},
+		--		},
+		--	},
+		--	filetypes = {
+		--		"javascript",
+		--		"typescript",
+		--		"vue",
+		--	},
+		--})
 
 		-- tailwind language server
 		lspconfig["tailwindcss"].setup({
