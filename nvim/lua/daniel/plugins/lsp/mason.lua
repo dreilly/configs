@@ -13,7 +13,7 @@ return {
 				"lua_ls",
 				"rust_analyzer",
 				"denols",
-				"tsserver",
+				"ts_ls",
 				"tailwindcss",
 				"prismals",
 				"cssls",

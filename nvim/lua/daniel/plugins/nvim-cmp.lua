@@ -36,7 +36,6 @@ return {
 				{ name = 'buffer',                 keyword_length = 1 }, -- source current buffer
 				{ name = 'vsnip',                  keyword_length = 1 }, -- nvim-cmp source for vim-vsnip
 				{ name = 'calc' },                                   -- source for math calculation
-				{ name = 'copilot' },                                -- source for math calculation
 			},
 			window = {
 				completion = cmp.config.window.bordered(),
@@ -50,7 +49,6 @@ return {
 						vsnip = '⋗',
 						buffer = 'Ω',
 						path = '🖫',
-						Copilot = "",
 					}
 					item.menu = menu_icon[entry.source.name]
 					return item

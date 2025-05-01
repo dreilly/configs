@@ -37,6 +37,8 @@ return {
 
 			opts.desc = "See available code actions"
 			keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
+
+			keymap.set('n', '<leader>h', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({})) end)
 		end
 
 		local capabilities = cmp_nvim_lsp.default_capabilities()
@@ -69,7 +71,7 @@ return {
 			severity_sort = false,
 			float = {
 				border = "single",
-				source = "always",
+				source = true,
 				header = "",
 				prefix = "",
 			},
@@ -84,6 +86,10 @@ return {
 			capabilities = capabilities,
 			on_attach = on_attach,
 			settings = {
+				inlayHints = {
+					-- include all inlay hint options
+					includeParameterNameHints = true,
+				},
 				Lua = {
 					runtime = {
 						version = "LuaJIT",
@@ -131,11 +137,28 @@ return {
 			root_dir = lspconfig["util"].root_pattern("deno.json", "deno.jsonc"),
 		})
 
+		-- vue language server
+		lspconfig["volar"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
+
 		-- typescript language server
-		lspconfig["tsserver"].setup({
+		lspconfig["ts_ls"].setup({
 			capabilities = capabilities,
 			on_attach = on_attach,
 			root_dir = lspconfig["util"].root_pattern("package.json"),
+			single_file_support = false,
+			init_options = {
+				plugins = {
+					{
+						name = "@vue/typescript-plugin",
+						location = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
+						languages = { "javascript", "typescript", "vue" }
+					}
+				}
+			},
+			filetypes = { "javascript", "typescript", "vue" }
 		})
 
 		-- tailwind language server
@@ -162,16 +185,13 @@ return {
 			on_attach = on_attach,
 		})
 
-		-- vue language server
-		lspconfig["volar"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-		})
-
-		-- python
-		lspconfig["pyright"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
+		lspconfig["eslint"].setup({
+			on_attach = function(client, bufnr)
+				vim.api.nvim_create_autocmd("BufWritePre", {
+					buffer = bufnr,
+					command = "EslintFixAll",
+				})
+			end,
 		})
 	end,
 }
