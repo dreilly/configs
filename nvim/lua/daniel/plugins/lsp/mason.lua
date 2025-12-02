@@ -12,17 +12,16 @@ return {
 			ensure_installed = {
 				"lua_ls",
 				"rust_analyzer",
-				"denols",
+				-- "denols",
 				"ts_ls",
 				"tailwindcss",
 				"prismals",
 				"cssls",
 				"gopls",
-				"volar",
 				"pyright",
 				"html",
 			},
-			automatic_installation = true,
+			automatic_enable = true,
 		})
 	end,
 }

@@ -130,12 +130,12 @@ return {
 			"ts=typescript",
 		}
 
-		-- deno language server
-		lspconfig["denols"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-			root_dir = lspconfig["util"].root_pattern("deno.json", "deno.jsonc"),
-		})
+		-- -- deno language server
+		-- lspconfig["denols"].setup({
+		-- 	capabilities = capabilities,
+		-- 	on_attach = on_attach,
+		-- 	root_dir = lspconfig["util"].root_pattern("deno.json", "deno.jsonc"),
+		-- })
 
 		-- vue language server
 		lspconfig["volar"].setup({
