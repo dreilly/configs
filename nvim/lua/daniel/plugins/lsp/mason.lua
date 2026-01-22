@@ -5,14 +5,13 @@ return {
 	},
 	config = function()
 		local mason = require("mason")
-		mason.setup({})
+		mason.setup({ })
 		local mason_lspconfig = require("mason-lspconfig")
 
 		mason_lspconfig.setup({
 			ensure_installed = {
 				"lua_ls",
 				"rust_analyzer",
-				-- "denols",
 				"ts_ls",
 				"tailwindcss",
 				"prismals",

@@ -5,7 +5,7 @@ return {
 		"hrsh7th/cmp-nvim-lsp",
 	},
 	config = function()
-		local lspconfig = require("lspconfig")
+		local lspconfig = vim.lsp.config
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
 		local opts = { noremap = true, silent = true }
@@ -82,33 +82,7 @@ return {
 		]])
 
 		--configure lus_ls server
-		lspconfig["lua_ls"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-			settings = {
-				inlayHints = {
-					-- include all inlay hint options
-					includeParameterNameHints = true,
-				},
-				Lua = {
-					runtime = {
-						version = "LuaJIT",
-					},
-					diagnostics = {
-						globals = { "vim" },
-					},
-					workspace = {
-						library = {
-							[vim.fn.expand("$VIMRUNTIME/lua")] = true,
-							[vim.fn.stdpath("config") .. "/lua"] = true,
-						},
-					},
-					telemetry = {
-						enable = false,
-					},
-				},
-			},
-		})
+		lspconfig["lua_ls"].setup({ })
 
 		lspconfig["rust_analyzer"].setup({
 			capabilities = capabilities,
