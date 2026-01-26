@@ -6,9 +6,8 @@ return {
 
 		conform.setup({
 			formatters_by_ft = {
-				javascript = { "prettier" },
-				typescript = { "prettier" },
-				vue = { "prettier" },
+				-- javascript = { "prettier" },
+				-- typescript = { "prettier" },
 				javascriptreact = { "prettier" },
 				typescriptreact = { "prettier" },
 				css = { "prettier" },
@@ -20,7 +19,7 @@ return {
 				python = { "isort", "black" },
 			},
 			format_on_save = {
-				lsp_fallback = true,
+				lsp_fallback = false,
 				async = false,
 				timeout_ms = 500,
 			},

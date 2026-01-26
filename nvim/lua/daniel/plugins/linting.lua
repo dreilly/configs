@@ -3,14 +3,11 @@ return {
 	event = { "BufReadPre", "BufNewFile" },
 	config = function()
 		local lint = require("lint")
-		lint.linters_by_ft = {
-			javascript = { "eslint" },
-			typescript = { "eslint" },
-			javascriptreact = { "eslint_d" },
-			typescriptreact = { "eslint_d" },
-			vue = { "eslint" },
-			python = { "pylint" },
-		}
+	lint.linters_by_ft = {
+		-- TypeScript/JavaScript linting handled by ESLint LSP
+		-- Uncomment below if you need nvim-lint for other languages
+		-- python = { "pylint" },
+	}
 
 		local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
 		vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {

@@ -5,6 +5,7 @@ return {
 	"MunifTanjim/prettier.nvim",
 	"nvim-lua/plenary.nvim",
 	"fgheng/winbar.nvim",
+	"zbirenbaum/copilot.lua",
 
 
 	-- Maybe deletes
