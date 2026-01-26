@@ -64,10 +64,17 @@ return {
 				vim.keymap.set("n", "g[", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Go to previous LSP diagnostic" }))
 				vim.keymap.set("n", "g]", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Go to next LSP diagnostic" }))
 				vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Show LSP hover info" }))
-				vim.keymap.set("n", "gD", "<cmd>Telescope lsp_implementations<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP implementations" }))
-				vim.keymap.set("n", "1gD", "<cmd>Telescope lsp_type_definitions<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP type definitions" }))
+
+				-- Built-in for single-result actions (faster, jumps directly)
+				vim.keymap.set("n", "gd", vim.lsp.buf.definition, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
+				vim.keymap.set("n", "gD", vim.lsp.buf.declaration, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
+
+				-- Telescope for multi-result actions (better UI for browsing)
 				vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP references" }))
-				vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP definitions" }))
+				vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP implementations" }))
+				vim.keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP type definitions" }))
+				vim.keymap.set("n", "gs", "<cmd>Telescope lsp_document_symbols<CR>", vim.tbl_extend("force", opts, { desc = "Show document symbols" }))
+
 				vim.keymap.set("n", "gn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Smart rename" }))
 				vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "See available code actions" }))
 				vim.keymap.set("n", "<leader>h", function()
@@ -113,11 +120,21 @@ return {
 						checkThirdParty = false,
 					},
 					telemetry = { enable = false },
+					hint = { enable = true },
 				},
 			},
 		})
 
-		-- TypeScript - add Vue plugin support
+		-- TypeScript - add Vue plugin support and inlay hints
+		local inlay_hints_settings = {
+			includeInlayParameterNameHints = "all",
+			includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+			includeInlayFunctionParameterTypeHints = true,
+			includeInlayVariableTypeHints = true,
+			includeInlayPropertyDeclarationTypeHints = true,
+			includeInlayFunctionLikeReturnTypeHints = true,
+			includeInlayEnumMemberValueHints = true,
+		}
 		vim.lsp.config("ts_ls", {
 			init_options = {
 				plugins = {
@@ -129,6 +146,10 @@ return {
 				},
 			},
 			filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
+			settings = {
+				typescript = { inlayHints = inlay_hints_settings },
+				javascript = { inlayHints = inlay_hints_settings },
+			},
 		})
 
 		-- Vue - works with ts_ls via @vue/typescript-plugin
@@ -143,7 +164,7 @@ return {
 			},
 		})
 
-		-- C#/.NET - OmniSharp with useful settings
+		-- C#/.NET - OmniSharp with useful settings and inlay hints
 		vim.lsp.config("omnisharp", {
 			settings = {
 				FormattingOptions = {
@@ -154,6 +175,48 @@ return {
 					EnableAnalyzersSupport = true,
 					EnableImportCompletion = true,
 					EnableDecompilationSupport = true,
+					InlayHintsOptions = {
+						EnableForParameters = true,
+						ForLiteralParameters = true,
+						ForIndexerParameters = true,
+						ForObjectCreationParameters = true,
+						ForOtherParameters = true,
+						EnableForTypes = true,
+						ForImplicitVariableTypes = true,
+						ForLambdaParameterTypes = true,
+						ForImplicitObjectCreation = true,
+					},
+				},
+			},
+		})
+
+		-- Rust - rust-analyzer with inlay hints
+		vim.lsp.config("rust_analyzer", {
+			settings = {
+				["rust-analyzer"] = {
+					inlayHints = {
+						parameterHints = { enable = true },
+						typeHints = { enable = true },
+						chainingHints = { enable = false }, -- can be noisy
+						closingBraceHints = { enable = true, minLines = 20 },
+					},
+				},
+			},
+		})
+
+		-- Go - gopls with inlay hints
+		vim.lsp.config("gopls", {
+			settings = {
+				gopls = {
+					hints = {
+						assignVariableTypes = true,
+						compositeLiteralFields = true,
+						compositeLiteralTypes = false, -- can be noisy
+						constantValues = true,
+						functionTypeParameters = true,
+						parameterNames = true,
+						rangeVariableTypes = true,
+					},
 				},
 			},
 		})
@@ -168,6 +231,8 @@ return {
 			"html",
 			"eslint",
 			"omnisharp",
+			"rust_analyzer",
+			"gopls",
 		})
 	end,
 }
