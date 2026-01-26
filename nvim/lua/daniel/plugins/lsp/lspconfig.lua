@@ -1,3 +1,7 @@
+-- LSP Configuration using Neovim 0.11+ native API
+-- nvim-lspconfig provides the default configs in lsp/*.lua
+-- We use vim.lsp.config() to extend them and vim.lsp.enable() to activate
+
 return {
 	"neovim/nvim-lspconfig",
 	event = { "BufReadPre", "BufNewFile" },
@@ -5,43 +9,10 @@ return {
 		"hrsh7th/cmp-nvim-lsp",
 	},
 	config = function()
-		local lspconfig = vim.lsp.config
 		local cmp_nvim_lsp = require("cmp_nvim_lsp")
-
-		local opts = { noremap = true, silent = true }
-		local keymap = vim.keymap
-		local on_attach = function(client, bufnr)
-			opts.buffer = bufnr
-			keymap.set("n", "g[", vim.diagnostic.goto_prev, opts)
-
-			opts.desc = "Go to next LSP diagnostic"
-			keymap.set("n", "g]", vim.diagnostic.goto_next, opts)
-
-			opts.desc = "Show LSP info for whats under the cursor"
-			keymap.set("n", "K", vim.lsp.buf.hover, opts)
-
-			opts.desc = "Show LSP implementations"
-			keymap.set("n", "gD", "<cmd>Telescope lsp_implementations<CR>", opts)
-
-			opts.desc = "Show LSP type definitions"
-			keymap.set("n", "1gD", "<cmd>Telescope lsp_type_definitions<CR>", opts)
-
-			opts.desc = "Show LSP references"
-			keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts)
-
-			opts.desc = "Show LSP definitions"
-			keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
-
-			opts.desc = "Smart rename"
-			keymap.set("n", "gn", vim.lsp.buf.rename, opts)
-
-			opts.desc = "See available code actions"
-			keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-
-			keymap.set('n', '<leader>h', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({})) end)
-		end
-
 		local capabilities = cmp_nvim_lsp.default_capabilities()
+
+		-- Diagnostic signs
 		local sign = function(opt)
 			vim.fn.sign_define(opt.name, {
 				texthl = opt.name,
@@ -50,19 +21,19 @@ return {
 			})
 		end
 
-		if vim.fn.has('macunix')
-		then
-			sign({ name = "DiagnosticSignError", text = "◉" })
-			sign({ name = "DiagnosticSignWarn", text = "" })
-			sign({ name = "DiagnosticSignHint", text = "⚡︎" })
-			sign({ name = "DiagnosticSignInfo", text = "" })
+		if vim.fn.has("macunix") == 1 then
+			sign({ name = "DiagnosticSignError", text = "" })
+			sign({ name = "DiagnosticSignWarn", text = "" })
+			sign({ name = "DiagnosticSignHint", text = "" })
+			sign({ name = "DiagnosticSignInfo", text = "" })
 		else
-			sign({ name = "DiagnosticSignError", text = "" })
-			sign({ name = "DiagnosticSignWarn", text = "" })
-			sign({ name = "DiagnosticSignHint", text = "" })
-			sign({ name = "DiagnosticSignInfo", text = "" })
+			sign({ name = "DiagnosticSignError", text = "" })
+			sign({ name = "DiagnosticSignWarn", text = "" })
+			sign({ name = "DiagnosticSignHint", text = "" })
+			sign({ name = "DiagnosticSignInfo", text = "" })
 		end
 
+		-- Diagnostic configuration
 		vim.diagnostic.config({
 			virtual_text = false,
 			signs = true,
@@ -77,95 +48,126 @@ return {
 			},
 		})
 
-		vim.cmd([[
-			autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
-		]])
+		-- Show diagnostics on cursor hold
+		vim.api.nvim_create_autocmd("CursorHold", {
+			callback = function()
+				vim.diagnostic.open_float(nil, { focusable = false })
+			end,
+		})
 
-		--configure lus_ls server
-		lspconfig["lua_ls"].setup({ })
+		-- LSP keybindings via LspAttach autocommand
+		vim.api.nvim_create_autocmd("LspAttach", {
+			callback = function(args)
+				local bufnr = args.buf
+				local opts = { buffer = bufnr, noremap = true, silent = true }
 
-		lspconfig["rust_analyzer"].setup({
+				vim.keymap.set("n", "g[", vim.diagnostic.goto_prev, vim.tbl_extend("force", opts, { desc = "Go to previous LSP diagnostic" }))
+				vim.keymap.set("n", "g]", vim.diagnostic.goto_next, vim.tbl_extend("force", opts, { desc = "Go to next LSP diagnostic" }))
+				vim.keymap.set("n", "K", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Show LSP hover info" }))
+				vim.keymap.set("n", "gD", "<cmd>Telescope lsp_implementations<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP implementations" }))
+				vim.keymap.set("n", "1gD", "<cmd>Telescope lsp_type_definitions<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP type definitions" }))
+				vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP references" }))
+				vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", vim.tbl_extend("force", opts, { desc = "Show LSP definitions" }))
+				vim.keymap.set("n", "gn", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Smart rename" }))
+				vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, vim.tbl_extend("force", opts, { desc = "See available code actions" }))
+				vim.keymap.set("n", "<leader>h", function()
+					vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({}))
+				end, vim.tbl_extend("force", opts, { desc = "Toggle inlay hints" }))
+			end,
+		})
+
+		-- ESLint auto-fix on save
+		vim.api.nvim_create_autocmd("LspAttach", {
+			callback = function(args)
+				local client = vim.lsp.get_client_by_id(args.data.client_id)
+				if client and client.name == "eslint" then
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer = args.buf,
+						callback = function()
+							vim.cmd("LspEslintFixAll")
+						end,
+					})
+				end
+			end,
+		})
+
+		-- ============================================
+		-- LSP Server Configurations
+		-- nvim-lspconfig provides defaults in lsp/*.lua
+		-- We extend them with capabilities and custom settings
+		-- ============================================
+
+		-- Global config for all servers
+		vim.lsp.config("*", {
 			capabilities = capabilities,
-			on_attach = on_attach,
-			cmd = {
-				"rustup",
-				"run",
-				"stable",
-				"rust-analyzer",
-			},
+		})
+
+		-- Lua - add Neovim runtime settings
+		vim.lsp.config("lua_ls", {
 			settings = {
-				["rust-analyzer"] = {
-					diagnostics = false,
+				Lua = {
+					runtime = { version = "LuaJIT" },
+					diagnostics = { globals = { "vim" } },
+					workspace = {
+						library = vim.api.nvim_get_runtime_file("", true),
+						checkThirdParty = false,
+					},
+					telemetry = { enable = false },
 				},
 			},
 		})
 
-		vim.g.markdown_fenced_languages = {
-			"ts=typescript",
-		}
-
-		-- -- deno language server
-		-- lspconfig["denols"].setup({
-		-- 	capabilities = capabilities,
-		-- 	on_attach = on_attach,
-		-- 	root_dir = lspconfig["util"].root_pattern("deno.json", "deno.jsonc"),
-		-- })
-
-		-- vue language server
-		lspconfig["volar"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-		})
-
-		-- typescript language server
-		lspconfig["ts_ls"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-			root_dir = lspconfig["util"].root_pattern("package.json"),
-			single_file_support = false,
+		-- TypeScript - add Vue plugin support
+		vim.lsp.config("ts_ls", {
 			init_options = {
 				plugins = {
 					{
 						name = "@vue/typescript-plugin",
-						location = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
-						languages = { "javascript", "typescript", "vue" }
-					}
-				}
+						location = vim.fn.stdpath("data") .. "/mason/packages/vue-language-server/node_modules/@vue/language-server",
+						languages = { "javascript", "typescript", "vue" },
+					},
+				},
 			},
-			filetypes = { "javascript", "typescript", "vue" }
+			filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
 		})
 
-		-- tailwind language server
-		lspconfig["tailwindcss"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
+		-- Vue - works with ts_ls via @vue/typescript-plugin
+		vim.lsp.config("vue_ls", {})
+
+		-- CSS - enable validation
+		vim.lsp.config("cssls", {
+			settings = {
+				css = { validate = true },
+				scss = { validate = true },
+				less = { validate = true },
+			},
 		})
 
-		-- prisma language server
-		lspconfig["prismals"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
+		-- C#/.NET - OmniSharp with useful settings
+		vim.lsp.config("omnisharp", {
+			settings = {
+				FormattingOptions = {
+					EnableEditorConfigSupport = true,
+					OrganizeImports = true,
+				},
+				RoslynExtensionsOptions = {
+					EnableAnalyzersSupport = true,
+					EnableImportCompletion = true,
+					EnableDecompilationSupport = true,
+				},
+			},
 		})
 
-		-- css language server
-		lspconfig["cssls"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-		})
-
-		-- go language server
-		lspconfig["gopls"].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-		})
-
-		lspconfig["eslint"].setup({
-			on_attach = function(client, bufnr)
-				vim.api.nvim_create_autocmd("BufWritePre", {
-					buffer = bufnr,
-					command = "EslintFixAll",
-				})
-			end,
+		-- Enable all LSP servers
+		vim.lsp.enable({
+			"lua_ls",
+			"ts_ls",
+			"vue_ls",
+			"tailwindcss",
+			"cssls",
+			"html",
+			"eslint",
+			"omnisharp",
 		})
 	end,
 }
