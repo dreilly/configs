@@ -22,7 +22,7 @@ vim.opt.shortmess:append({ I = true })
 vim.opt.shortmess:append({ c = true })
 vim.opt.cursorline = true
 vim.opt.scrolloff = 10
-vim.opt.background = "dark"
+
 vim.opt.backspace:append({ indent = true })
 vim.opt.backspace:append({ eol = true })
 vim.opt.backspace:append({ start = true })
