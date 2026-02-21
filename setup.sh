@@ -19,6 +19,10 @@ ln -sf "$CONFIGS_DIR/tmux/switch-theme.sh" ~/.tmux/switch-theme.sh
 echo "  ~/.tmux.conf -> $CONFIGS_DIR/tmux/tmux.conf"
 echo "  ~/.tmux/{dark,light,switch-theme}.sh -> $CONFIGS_DIR/tmux/"
 
+# Ghostty
+ln -sfn "$CONFIGS_DIR/ghostty" ~/.config/ghostty
+echo "  ~/.config/ghostty -> $CONFIGS_DIR/ghostty"
+
 # Install TPM if not present
 if [ ! -d ~/.tmux/plugins/tpm ]; then
   echo "Installing TPM..."

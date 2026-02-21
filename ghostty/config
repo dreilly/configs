@@ -1,0 +1,8 @@
+cursor-style = underline
+shell-integration-features = no-cursor
+keybind = shift+enter=text:\n
+font-family = "Maple Mono"
+#font-family = "FiraCode Nerd Font Mono"
+theme = dark:Catppuccin Mocha,light:Catppuccin Latte
+#theme = Catppuccin Mocha
+
