@@ -23,6 +23,13 @@ echo "  ~/.tmux/{dark,light,switch-theme}.sh -> $CONFIGS_DIR/tmux/"
 ln -sfn "$CONFIGS_DIR/ghostty" ~/.config/ghostty
 echo "  ~/.config/ghostty -> $CONFIGS_DIR/ghostty"
 
+# OpenCode
+mkdir -p ~/.config/opencode
+ln -sfn "$CONFIGS_DIR/opencode/commands" ~/.config/opencode/commands
+ln -sf "$CONFIGS_DIR/opencode/opencode.json" ~/.config/opencode/opencode.json
+echo "  ~/.config/opencode/opencode.json -> $CONFIGS_DIR/opencode/opencode.json"
+echo "  ~/.config/opencode/commands -> $CONFIGS_DIR/opencode/commands"
+
 # Install TPM if not present
 if [ ! -d ~/.tmux/plugins/tpm ]; then
   echo "Installing TPM..."
