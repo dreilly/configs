@@ -25,6 +25,7 @@ return {
 			"css-lsp",                    -- cssls
 			"html-lsp",                   -- html
 			"eslint-lsp",                 -- eslint
+			"clangd",                     -- clangd (C/C++)
 			"omnisharp",                  -- omnisharp (C#/.NET)
 			"rust-analyzer",              -- rust_analyzer (Rust)
 			"gopls",                      -- gopls (Go)

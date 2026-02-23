@@ -230,6 +230,7 @@ return {
 			"cssls",
 			"html",
 			"eslint",
+			"clangd",
 			"omnisharp",
 			"rust_analyzer",
 			"gopls",
