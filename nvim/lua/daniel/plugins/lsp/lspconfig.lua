@@ -98,6 +98,21 @@ return {
 			end,
 		})
 
+		-- Clang-format on save for C/C++
+		vim.api.nvim_create_autocmd("LspAttach", {
+			callback = function(args)
+				local client = vim.lsp.get_client_by_id(args.data.client_id)
+				if client and client.name == "clangd" then
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer = args.buf,
+						callback = function()
+							vim.lsp.buf.format({ async = false })
+						end,
+					})
+				end
+			end,
+		})
+
 		-- ============================================
 		-- LSP Server Configurations
 		-- nvim-lspconfig provides defaults in lsp/*.lua
@@ -218,6 +233,13 @@ return {
 						rangeVariableTypes = true,
 					},
 				},
+			},
+		})
+
+		-- C/C++ - clangd with C23 standard
+		vim.lsp.config("clangd", {
+			init_options = {
+				fallbackFlags = { "-std=c23" },
 			},
 		})
 
