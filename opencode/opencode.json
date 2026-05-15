@@ -1,6 +1,5 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "theme": "system",
   "mcp": {
     "chrome-devtools": {
       "type": "local",
@@ -13,9 +12,9 @@
       "enabled": false
     }
   },
-  "keybinds": {
-    "leader": "ctrl+o"
-  },
+	"experimental": {
+		"disable_paste_summary": true
+	},
   "agent": {
     "build": {
       "permission": {
