@@ -155,6 +155,9 @@ return {
 		-- Vue - works with ts_ls via @vue/typescript-plugin
 		vim.lsp.config("vue_ls", {})
 
+		-- Svelte
+		vim.lsp.config("svelte", {})
+
 		-- CSS - enable validation
 		vim.lsp.config("cssls", {
 			settings = {
@@ -226,6 +229,7 @@ return {
 			"lua_ls",
 			"ts_ls",
 			"vue_ls",
+			"svelte",
 			"tailwindcss",
 			"cssls",
 			"html",

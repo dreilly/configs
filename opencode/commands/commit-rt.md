@@ -16,7 +16,7 @@ Generate a commit message for the user to copy.
 4. Output the message in this exact format for the user to copy:
 
 ```
-Issue #<issue-number>
+Ticket #<issue-number>
 
 <message>
 ```
