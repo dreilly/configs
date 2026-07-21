@@ -1,0 +1,11 @@
+onboarding = false
+
+[keys]
+previous_workspace = "prefix+p"
+next_workspace = "prefix+n"
+switch_workspace = "prefix+1..9"
+previous_tab = "prefix+<"
+next_tab = "prefix+>"
+switch_tab = ""
+split_horizontal = 'prefix+"'
+split_vertical = "prefix+%"

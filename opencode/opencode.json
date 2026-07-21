@@ -1,6 +1,39 @@
 {
   "$schema": "https://opencode.ai/config.json",
-	"plugin": ["@plannotator/opencode@latest"],
+  "plugin": [
+    ["@plannotator/opencode@latest", {
+      "workflow": "manual"
+    }]
+  ],
+  "instructions": [
+    "/Users/dreilly/code/configs/opencode/AGENTS.md"
+  ],
+  "references": {
+    "hibber": {
+      "path": "~/code/hibber",
+      "description": "Use for Hibber project context, including application behavior, domain information, and implementation details."
+    },
+    "json_qa": {
+      "path": "~/code/json_qa",
+      "description": "Use for JSON QA project context, including application behavior, domain information, and implementation details."
+    },
+    "realtime": {
+      "path": "~/code/realtime",
+      "description": "Use for core Realtime product context, including application behavior, domain information, and database schema details."
+    },
+    "realtime-api-ts": {
+      "path": "~/code/realtime-api-ts",
+      "description": "Use for Realtime API implementation details, endpoint behavior, and API schema definitions."
+    },
+    "realtime-mcp": {
+      "path": "~/code/realtime-mcp",
+      "description": "Use for the Realtime MCP server implementation, including tool definitions, API client behavior, and MCP integration details."
+    },
+    "realtime-agent": {
+      "path": "~/code/realtime-agent",
+      "description": "Use for the Realtime assistant service, including chat routes, LLM orchestration, conversation history, audit logging, and MCP-backed SIS data access."
+    }
+  },
   "mcp": {
     "chrome-devtools": {
       "type": "local",
@@ -18,12 +51,27 @@
 	},
   "permission": {
     "external_directory": {
-      "~/code/**": "allow"
+      "~/code/**": "allow",
+      "/opt/homebrew/Cellar/hunk/**": "allow"
+    },
+    "read": {
+      "/opt/homebrew/Cellar/hunk/*/libexec/skills/**": "allow"
+    },
+    "edit": {
+      "*": "allow",
+      "/Users/dreilly/code/**": "ask"
     }
   },
   "agent": {
     "build": {
       "permission": {
+        "external_directory": {
+          "~/code/**": "allow",
+          "/opt/homebrew/Cellar/hunk/**": "allow"
+        },
+        "read": {
+          "/opt/homebrew/Cellar/hunk/*/libexec/skills/**": "allow"
+        },
         "bash": {
           "git commit*": "deny",
           "git add*": "deny",

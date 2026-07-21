@@ -7,7 +7,7 @@ echo "Setting up config symlinks from $CONFIGS_DIR"
 
 # Neovim
 mkdir -p ~/.config
-ln -sf "$CONFIGS_DIR/nvim" ~/.config/nvim
+ln -sfn "$CONFIGS_DIR/nvim" ~/.config/nvim
 echo "  ~/.config/nvim -> $CONFIGS_DIR/nvim"
 
 # Tmux
@@ -29,6 +29,19 @@ ln -sfn "$CONFIGS_DIR/opencode/commands" ~/.config/opencode/commands
 ln -sf "$CONFIGS_DIR/opencode/opencode.json" ~/.config/opencode/opencode.json
 echo "  ~/.config/opencode/opencode.json -> $CONFIGS_DIR/opencode/opencode.json"
 echo "  ~/.config/opencode/commands -> $CONFIGS_DIR/opencode/commands"
+
+# Pi
+mkdir -p ~/.pi/agent
+ln -sf "$CONFIGS_DIR/pi/settings.json" ~/.pi/agent/settings.json
+ln -sf "$CONFIGS_DIR/pi/keybindings.json" ~/.pi/agent/keybindings.json
+ln -sfn "$CONFIGS_DIR/pi/themes" ~/.pi/agent/themes
+ln -sfn "$CONFIGS_DIR/pi/prompts" ~/.pi/agent/prompts
+ln -sfn "$CONFIGS_DIR/pi/extensions" ~/.pi/agent/extensions
+npm install --omit=dev --ignore-scripts --no-audit --no-fund \
+  --prefix "$CONFIGS_DIR/pi/extensions/web-tools"
+echo "  ~/.pi/agent/{settings,keybindings}.json -> $CONFIGS_DIR/pi/"
+echo "  ~/.pi/agent/{themes,prompts,extensions} -> $CONFIGS_DIR/pi/"
+echo "  Installed Pi web-tools runtime dependencies"
 
 # Install TPM if not present
 if [ ! -d ~/.tmux/plugins/tpm ]; then
