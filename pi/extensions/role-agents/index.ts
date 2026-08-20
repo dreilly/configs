@@ -19,16 +19,15 @@ const RoleAgentParams = Type.Object({
 	task: Type.String({ description: "Focused task for the role agent." }),
 	surface: Type.Optional(
 		StringEnum(["headless", "herdr"] as const, {
-			description: "headless returns a streamed result inline. herdr opens or reuses a visible Pi pane and must only be used when the user explicitly asks for Herdr or a visible agent.",
+			description: "headless returns a streamed result inline. herdr opens or reuses a visible Pi pane in the current tab and must only be used when the user explicitly asks for Herdr or a visible agent. Herdr delegation never creates tabs, workspaces, or worktrees.",
 			default: "headless",
 		}),
 	),
 	cwd: Type.Optional(Type.String({ description: "Working directory. Defaults to the parent Pi cwd." })),
 	wait: Type.Optional(Type.Boolean({ description: "For Herdr, wait for the agent to settle and return recent pane output. Default true." })),
-	reuse: Type.Optional(Type.Boolean({ description: "For Herdr, reuse the named role pane in this workspace when possible. Default true." })),
-	keepOpen: Type.Optional(Type.Boolean({ description: "For Herdr, keep a successfully completed pane open. Default false for newly created non-worktree panes." })),
-	worktree: Type.Optional(Type.Boolean({ description: "For Herdr, create an isolated worktree workspace. Use for parallel writers." })),
-	direction: Type.Optional(StringEnum(["right", "down"] as const, { description: "Herdr split direction. Default right." })),
+	reuse: Type.Optional(Type.Boolean({ description: "For Herdr, reuse the named role pane in the current tab when possible. Default true." })),
+	keepOpen: Type.Optional(Type.Boolean({ description: "For Herdr, keep a successfully completed pane open. Default false. Set true only when the user explicitly asks for the pane to remain open for inspection or follow-ups." })),
+	direction: Type.Optional(StringEnum(["right", "down"] as const, { description: "Herdr pane split direction in the current tab. Default right." })),
 	timeoutMs: Type.Optional(Type.Integer({ minimum: 1000, maximum: 3_600_000, description: "Herdr wait deadline in milliseconds." })),
 });
 
@@ -122,6 +121,8 @@ export default function roleAgentsExtension(pi: ExtensionAPI) {
 			"Use headless for short independent scout/research tasks whose final answer is enough.",
 			"Do not delegate routine work that the parent can perform directly.",
 			"Use the herdr surface only when the user explicitly asks for Herdr, a visible pane, or a persistent agent.",
+			"A Herdr request always means a pane in the current tab: never create a new tab, workspace, or worktree for role delegation.",
+			"Close newly created Herdr panes after successful completion by default; keep them open only when the user explicitly requests persistence, inspection, or follow-up access.",
 			"Parallelism comes from issuing independent role_agent calls in the same turn; roles cannot spawn other roles.",
 		].join(" "),
 		promptSnippet: "Run a focused Markdown-defined role headlessly or in an explicitly requested Herdr pane",
@@ -150,7 +151,6 @@ export default function roleAgentsExtension(pi: ExtensionAPI) {
 						wait: params.wait,
 						reuse: params.reuse,
 						keepOpen: params.keepOpen,
-						worktree: params.worktree,
 						direction: params.direction,
 						timeoutMs: params.timeoutMs,
 					});

@@ -4,6 +4,10 @@ import * as os from "node:os";
 import * as path from "node:path";
 import type { RoleAgent } from "./agents.ts";
 
+// Herdr's split ratio is the share retained by the target pane. Keeping 80%
+// makes the caller remain the largest pane even when several roles are opened.
+const CALLER_PANE_RATIO = "0.8";
+
 interface ExecResult {
 	stdout: string;
 	stderr: string;
@@ -76,12 +80,12 @@ function buildPiArgs(agent: RoleAgent): string[] {
 	return args;
 }
 
-async function findReusableAgent(exec: ExecCommand, name: string, cwd: string, signal?: AbortSignal) {
+async function findReusableAgent(exec: ExecCommand, name: string, cwd: string, tabId: string, signal?: AbortSignal) {
 	const result = await exec("herdr", ["agent", "get", name], { signal, timeout: 5000 });
 	if (result.code !== 0) return undefined;
 	const payload = parseJson(result.stdout);
 	const record = payload?.result?.agent ?? payload?.result?.pane ?? payload?.result;
-	if (!record?.pane_id || record.cwd !== cwd) return undefined;
+	if (!record?.pane_id || record.cwd !== cwd || record.tab_id !== tabId) return undefined;
 	return { paneId: record.pane_id as string, workspaceId: record.workspace_id as string | undefined };
 }
 
@@ -96,25 +100,28 @@ export async function runHerdrRole(options: {
 	direction?: "right" | "down";
 	reuse?: boolean;
 	keepOpen?: boolean;
-	worktree?: boolean;
 }): Promise<HerdrRunResult> {
 	if (process.env.HERDR_ENV !== "1") {
 		throw new Error("Herdr surface requires running Pi inside a Herdr-managed pane (HERDR_ENV=1). ");
+	}
+	const currentTabId = process.env.HERDR_TAB_ID;
+	if (!currentTabId) {
+		throw new Error("Herdr did not provide HERDR_TAB_ID, so role-agents cannot safely create a pane in the current tab.");
 	}
 
 	const { agent, task, cwd, exec, signal } = options;
 	const wait = options.wait ?? true;
 	const keepOpen = options.keepOpen ?? false;
 	const timeoutMs = options.timeoutMs ?? 300_000;
-	const reuse = (options.reuse ?? true) && !options.worktree;
-	const workspaceSuffix = sanitizeName(process.env.HERDR_WORKSPACE_ID || "workspace");
-	let agentName = sanitizeName(`${agent.name}-${workspaceSuffix}`);
+	const reuse = options.reuse ?? true;
+	const tabSuffix = sanitizeName(currentTabId);
+	let agentName = sanitizeName(`${agent.name}-${tabSuffix}`);
 	let paneId: string | undefined;
 	let workspaceId: string | undefined;
 	let reused = false;
 
 	if (reuse) {
-		const existing = await findReusableAgent(exec, agentName, cwd, signal);
+		const existing = await findReusableAgent(exec, agentName, cwd, currentTabId, signal);
 		if (existing) {
 			paneId = existing.paneId;
 			workspaceId = existing.workspaceId;
@@ -123,22 +130,14 @@ export async function runHerdrRole(options: {
 	}
 
 	if (!paneId) {
-		if (!reuse) agentName = sanitizeName(`${agent.name}-${randomUUID().slice(0, 6)}`);
-		let createResult: ExecResult;
-		if (options.worktree) {
-			const branch = `role-agent/${agent.name}-${Date.now().toString(36)}`;
-			createResult = await exec(
-				"herdr",
-				["worktree", "create", "--cwd", cwd, "--branch", branch, "--label", agent.name, "--no-focus", "--json"],
-				{ signal, timeout: 30_000 },
-			);
-		} else {
-			createResult = await exec(
-				"herdr",
-				["pane", "split", "--current", "--direction", options.direction ?? "right", "--cwd", cwd, "--no-focus"],
-				{ signal, timeout: 10_000 },
-			);
-		}
+		if (!reuse) agentName = sanitizeName(`${agent.name}-${tabSuffix}-${randomUUID().slice(0, 6)}`);
+		// Herdr delegation is intentionally pane-only: split the caller's pane so the
+		// role remains visible in the current tab. Never create a tab, workspace, or worktree here.
+		const createResult = await exec(
+			"herdr",
+			["pane", "split", "--current", "--direction", options.direction ?? "right", "--ratio", CALLER_PANE_RATIO, "--cwd", cwd, "--no-focus"],
+			{ signal, timeout: 10_000 },
+		);
 		if (createResult.code !== 0) throw new Error(createResult.stderr.trim() || "Herdr could not create a pane.");
 		const created = paneFromResult(parseJson(createResult.stdout));
 		paneId = created.paneId;
@@ -158,7 +157,7 @@ export async function runHerdrRole(options: {
 			await new Promise((resolve) => setTimeout(resolve, 200));
 		}
 		if (!startResult || startResult.code !== 0) {
-			if (!options.worktree) await exec("herdr", ["pane", "close", paneId], { timeout: 5000 });
+			await exec("herdr", ["pane", "close", paneId], { timeout: 5000 });
 			throw new Error(startResult?.stderr.trim() || startResult?.stdout.trim() || "Herdr could not start Pi.");
 		}
 	}
@@ -182,7 +181,7 @@ export async function runHerdrRole(options: {
 	}
 
 	const completed = wait && (status === "done" || status === "idle");
-	const shouldClose = completed && !keepOpen && !reused && !options.worktree;
+	const shouldClose = completed && !keepOpen && !reused;
 	let closed = false;
 	let closeError: string | undefined;
 	if (shouldClose) {
@@ -193,7 +192,7 @@ export async function runHerdrRole(options: {
 
 	const lifecycle = closed
 		? " Captured its output and closed the completed pane."
-		: completed && (keepOpen || reused || options.worktree)
+		: completed && (keepOpen || reused)
 			? " The completed pane remains open."
 			: !wait
 				? " The pane remains open because the call did not wait for completion."

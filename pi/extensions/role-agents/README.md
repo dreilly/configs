@@ -3,7 +3,7 @@
 Thin role-based delegation for Pi with two execution surfaces:
 
 - `headless` — a disposable isolated Pi process whose activity and final output stream inline.
-- `herdr` — a visible Pi session in a Herdr pane, optionally reused or launched in a worktree.
+- `herdr` — a visible Pi session in a pane in the current Herdr tab, optionally reused.
 
 Roles are Markdown files under `~/.pi/agent/agents/` (symlinked to this repository's `agents/` directory). Frontmatter supports:
 
@@ -28,7 +28,7 @@ Ask naturally:
 Use the scout role agent to map the authentication flow.
 Use the researcher role agent to compare the latest Pi subagent options.
 Open the researcher role agent in Herdr and keep the pane available for follow-ups.
-Open a worker role in a Herdr worktree for this implementation.
+Open a worker role in a Herdr pane for this implementation.
 ```
 
 Model-facing tool examples:
@@ -58,10 +58,12 @@ Model-facing tool examples:
 - Roles do not receive `role_agent` unless it is explicitly listed in their `tools`, so the bundled roles cannot recurse.
 - Headless runs use no Pi session and write no project artifacts.
 - Herdr requires `HERDR_ENV=1`. It opens a real interactive Pi session that remains visible while it works.
+- Herdr delegation is pane-only: it splits the caller's pane in the current tab and never creates a tab, workspace, or worktree.
+- New splits retain 80% of the available area for the caller, keeping the pane where the request originated larger than its delegated panes.
+- Reuse is also scoped to the current tab, so an agent in another tab will not be selected.
 - Herdr calls wait by default. After capturing output, a successfully completed newly created split pane closes automatically.
-- Failed or blocked panes, reused panes, worktrees, and calls with `wait: false` remain open for inspection.
-- Set `keepOpen: true` for a persistent successful pane that should accept follow-up prompts.
-- `worktree: true` delegates worktree creation to Herdr and should be used for parallel writers; worktrees are never removed automatically.
+- Failed or blocked panes, reused panes, and calls with `wait: false` remain open for inspection.
+- Successful newly created panes close by default; set `keepOpen: true` only when the user explicitly requests persistence, inspection, or follow-up access.
 - Herdr system-prompt snapshots are content-addressed under the OS temporary directory; they contain only the role prompt.
 
 ## Bundled roles
