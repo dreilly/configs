@@ -1,7 +1,7 @@
 ---
 name: scout
 description: Fast read-only codebase reconnaissance
-model: github-copilot/gpt-5.6-luna
+model: github-copilot/gemini-3.6-flash
 thinking: low
 tools: read, grep, find, ls
 systemPromptMode: replace
