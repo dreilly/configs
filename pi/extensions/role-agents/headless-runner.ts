@@ -32,6 +32,8 @@ export interface HeadlessRunState {
 	activity: ActivityItem[];
 	usage: UsageStats;
 	output: string;
+	stopReason?: string;
+	errorMessage?: string;
 	error?: string;
 	exitCode?: number;
 }
@@ -80,6 +82,8 @@ function appendAssistantActivity(state: HeadlessRunState, message: Message): voi
 		state.usage.cost += usage.cost?.total || 0;
 	}
 	if (!state.model && message.model) state.model = message.model;
+	state.stopReason = message.stopReason;
+	state.errorMessage = message.errorMessage;
 }
 
 export async function runHeadlessRole(options: {
@@ -95,6 +99,9 @@ export async function runHeadlessRole(options: {
 	if (agent.thinking) args.push("--thinking", agent.thinking);
 	if (agent.tools.length > 0) args.push("--tools", agent.tools.join(","));
 	else args.push("--no-tools");
+	if (!agent.skills) args.push("--no-skills");
+	if (!agent.contextFiles) args.push("--no-context-files");
+	if (!agent.promptTemplates) args.push("--no-prompt-templates");
 	args.push(agent.systemPromptMode === "append" ? "--append-system-prompt" : "--system-prompt", agent.systemPrompt);
 	args.push(task);
 
@@ -126,6 +133,16 @@ export async function runHeadlessRole(options: {
 			stdio: ["ignore", "pipe", "pipe"],
 			env: { ...process.env, PI_OFFLINE: "1", PI_ROLE_AGENT: agent.name },
 		});
+		let exited = false;
+		let forceKillTimer: NodeJS.Timeout | undefined;
+
+		const removeAbortListener = () => signal?.removeEventListener("abort", abort);
+		const finish = (code: number) => {
+			exited = true;
+			if (forceKillTimer) clearTimeout(forceKillTimer);
+			removeAbortListener();
+			resolve(code);
+		};
 
 		const processLine = (line: string) => {
 			if (!line.trim()) return;
@@ -156,20 +173,22 @@ export async function runHeadlessRole(options: {
 		});
 		proc.on("error", (error) => {
 			stderr += error.message;
-			resolve(1);
+			finish(1);
 		});
 		proc.on("close", (code) => {
 			if (buffer.trim()) processLine(buffer);
-			resolve(code ?? 1);
+			finish(code ?? 1);
 		});
 
-		const abort = () => {
+		function abort() {
+			if (exited) return;
 			aborted = true;
 			proc.kill("SIGTERM");
-			setTimeout(() => {
-				if (!proc.killed) proc.kill("SIGKILL");
-			}, 3000).unref();
-		};
+			forceKillTimer = setTimeout(() => {
+				if (!exited) proc.kill("SIGKILL");
+			}, 3000);
+			forceKillTimer.unref();
+		}
 		if (signal?.aborted) abort();
 		else signal?.addEventListener("abort", abort, { once: true });
 	});
@@ -182,7 +201,10 @@ export async function runHeadlessRole(options: {
 		state.error = "Role agent was aborted.";
 	} else if (exitCode !== 0) {
 		state.status = "failed";
-		state.error = stderr.trim() || `Pi exited with status ${exitCode}.`;
+		state.error = stderr.trim() || state.errorMessage || `Pi exited with status ${exitCode}.`;
+	} else if (state.stopReason === "error" || state.stopReason === "aborted") {
+		state.status = "failed";
+		state.error = state.errorMessage || `Role agent stopped with reason ${state.stopReason}.`;
 	} else {
 		state.status = "complete";
 	}

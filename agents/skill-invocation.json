@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "modes": {
+    "global:grill-me": "manual-only",
+    "user:grill-with-docs": "manual-only",
+    "global:handoff": "manual-only",
+    "global:plannotator-annotate": "manual-only",
+    "global:plannotator-compound": "manual-only",
+    "global:plannotator-last": "manual-only",
+    "global:plannotator-review": "manual-only",
+    "global:plannotator-setup-goal": "manual-only",
+    "global:plannotator-visual-explainer": "manual-only",
+    "global:setup-matt-pocock-skills": "manual-only",
+    "global:teach": "manual-only",
+    "global:to-issues": "manual-only"
+  }
+}

@@ -76,6 +76,9 @@ function buildPiArgs(agent: RoleAgent): string[] {
 	if (agent.thinking) args.push("--thinking", agent.thinking);
 	if (agent.tools.length > 0) args.push("--tools", agent.tools.join(","));
 	else args.push("--no-tools");
+	if (!agent.skills) args.push("--no-skills");
+	if (!agent.contextFiles) args.push("--no-context-files");
+	if (!agent.promptTemplates) args.push("--no-prompt-templates");
 	args.push(agent.systemPromptMode === "append" ? "--append-system-prompt" : "--system-prompt", promptFile(agent));
 	return args;
 }

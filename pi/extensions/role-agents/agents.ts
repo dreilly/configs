@@ -12,6 +12,9 @@ export interface RoleAgent {
 	model?: string;
 	thinking?: ThinkingLevel;
 	systemPromptMode: SystemPromptMode;
+	skills: boolean;
+	contextFiles: boolean;
+	promptTemplates: boolean;
 	systemPrompt: string;
 	filePath: string;
 }
@@ -55,6 +58,9 @@ function loadAgent(filePath: string): RoleAgent | undefined {
 		model: stringValue(frontmatter.model),
 		thinking: thinkingValue && THINKING_LEVELS.has(thinkingValue) ? thinkingValue : undefined,
 		systemPromptMode: promptMode === "append" ? "append" : "replace",
+		skills: frontmatter.skills !== false,
+		contextFiles: frontmatter.contextFiles !== false,
+		promptTemplates: frontmatter.promptTemplates !== false,
 		systemPrompt: body.trim(),
 		filePath,
 	};

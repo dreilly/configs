@@ -15,10 +15,13 @@ model: github-copilot/gpt-5.6-luna
 thinking: low
 tools: read, grep, find, ls
 systemPromptMode: replace
+skills: false
+contextFiles: true
+promptTemplates: false
 ---
 ```
 
-The Markdown body is the role's system prompt.
+The Markdown body is the role's system prompt. `skills`, `contextFiles`, and `promptTemplates` default to `true`; set them to `false` to keep unnecessary discovered resources out of the child prompt.
 
 ## Usage
 
@@ -68,7 +71,7 @@ Model-facing tool examples:
 
 ## Bundled roles
 
-- `scout` — Luna/low, read-only local reconnaissance.
+- `scout` — Gemini Flash/low, read-only local reconnaissance.
 - `researcher` — Terra/medium, `websearch` and `webfetch` only.
 - `worker` — Sol/high, focused implementation and validation.
 

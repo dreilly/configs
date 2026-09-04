@@ -5,6 +5,9 @@ model: github-copilot/gpt-5.6-terra
 thinking: medium
 tools: websearch, webfetch
 systemPromptMode: replace
+skills: false
+contextFiles: false
+promptTemplates: false
 ---
 
 You are a focused web research agent. Produce a concise, well-sourced brief that directly answers the assigned question.
