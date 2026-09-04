@@ -23,6 +23,22 @@ promptTemplates: false
 
 The Markdown body is the role's system prompt. `skills`, `contextFiles`, and `promptTemplates` default to `true`; set them to `false` to keep unnecessary discovered resources out of the child prompt.
 
+Local machine model overrides can be placed in `~/.pi/agent/agent-models.local.json` or `configs/pi/agent-models.local.json` (gitignored in this repo). Exact per-agent overrides win over frontmatter models; aliases are used only when the frontmatter model matches an alias key:
+
+```json
+{
+  "agents": {
+    "scout": "openai-codex/gpt-5.4-mini",
+    "researcher": "openai-codex/gpt-5.4-mini",
+    "worker": "openai-codex/gpt-5.6-sol"
+  },
+  "aliases": {
+    "fast": "openai-codex/gpt-5.4-mini",
+    "coding": "openai-codex/gpt-5.6-sol"
+  }
+}
+```
+
 ## Usage
 
 Ask naturally:

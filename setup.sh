@@ -2,61 +2,78 @@
 set -euo pipefail
 
 CONFIGS_DIR="$(cd "$(dirname "$0")" && pwd)"
+BACKUP_SUFFIX="backup.$(date +%Y%m%d%H%M%S)"
 
 echo "Setting up config symlinks from $CONFIGS_DIR"
 
+link_item() {
+  local source="$1"
+  local dest="$2"
+
+  mkdir -p "$(dirname "$dest")"
+
+  if [[ -L "$dest" ]]; then
+    rm "$dest"
+  elif [[ -e "$dest" ]]; then
+    local backup="${dest}.${BACKUP_SUFFIX}"
+    mv "$dest" "$backup"
+    echo "  Existing $dest moved to $backup"
+  fi
+
+  ln -s "$source" "$dest"
+  echo "  $dest -> $source"
+}
+
 # Neovim
-mkdir -p ~/.config
-ln -sfn "$CONFIGS_DIR/nvim" ~/.config/nvim
-echo "  ~/.config/nvim -> $CONFIGS_DIR/nvim"
+link_item "$CONFIGS_DIR/nvim" "$HOME/.config/nvim"
 
 # Tmux
-mkdir -p ~/.tmux
-ln -sf "$CONFIGS_DIR/tmux/tmux.conf" ~/.tmux.conf
-ln -sf "$CONFIGS_DIR/tmux/dark.conf" ~/.tmux/dark.conf
-ln -sf "$CONFIGS_DIR/tmux/light.conf" ~/.tmux/light.conf
-ln -sf "$CONFIGS_DIR/tmux/switch-theme.sh" ~/.tmux/switch-theme.sh
-echo "  ~/.tmux.conf -> $CONFIGS_DIR/tmux/tmux.conf"
-echo "  ~/.tmux/{dark,light,switch-theme}.sh -> $CONFIGS_DIR/tmux/"
+mkdir -p "$HOME/.tmux"
+link_item "$CONFIGS_DIR/tmux/tmux.conf" "$HOME/.tmux.conf"
+link_item "$CONFIGS_DIR/tmux/dark.conf" "$HOME/.tmux/dark.conf"
+link_item "$CONFIGS_DIR/tmux/light.conf" "$HOME/.tmux/light.conf"
+link_item "$CONFIGS_DIR/tmux/switch-theme.sh" "$HOME/.tmux/switch-theme.sh"
 
 # Ghostty
-ln -sfn "$CONFIGS_DIR/ghostty" ~/.config/ghostty
-echo "  ~/.config/ghostty -> $CONFIGS_DIR/ghostty"
+link_item "$CONFIGS_DIR/ghostty" "$HOME/.config/ghostty"
+
+# WezTerm
+link_item "$CONFIGS_DIR/wezterm" "$HOME/.config/wezterm"
+
+# i3 / i3status
+link_item "$CONFIGS_DIR/i3" "$HOME/.config/i3"
+link_item "$CONFIGS_DIR/i3status" "$HOME/.config/i3status"
+
+# Herdr
+link_item "$CONFIGS_DIR/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 
 # OpenCode
-mkdir -p ~/.config/opencode
-ln -sfn "$CONFIGS_DIR/opencode/commands" ~/.config/opencode/commands
-ln -sf "$CONFIGS_DIR/opencode/opencode.json" ~/.config/opencode/opencode.json
-echo "  ~/.config/opencode/opencode.json -> $CONFIGS_DIR/opencode/opencode.json"
-echo "  ~/.config/opencode/commands -> $CONFIGS_DIR/opencode/commands"
+mkdir -p "$HOME/.config/opencode"
+link_item "$CONFIGS_DIR/opencode/commands" "$HOME/.config/opencode/commands"
+link_item "$CONFIGS_DIR/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"
+link_item "$CONFIGS_DIR/opencode/tui.json" "$HOME/.config/opencode/tui.json"
+link_item "$CONFIGS_DIR/opencode/AGENTS.md" "$HOME/.config/opencode/AGENTS.md"
 
-# Shared agent skills
-if [[ -e ~/.agents && ! -L ~/.agents ]]; then
-  agents_backup="$HOME/.agents.backup.$(date +%Y%m%d%H%M%S)"
-  mv ~/.agents "$agents_backup"
-  echo "  Existing ~/.agents moved to $agents_backup"
-fi
-ln -sfn "$CONFIGS_DIR/agents" ~/.agents
-echo "  ~/.agents -> $CONFIGS_DIR/agents"
+# Shared agent skills/config
+link_item "$CONFIGS_DIR/agents" "$HOME/.agents"
 
 # Pi
-mkdir -p ~/.pi/agent
-ln -sf "$CONFIGS_DIR/pi/settings.json" ~/.pi/agent/settings.json
-ln -sf "$CONFIGS_DIR/pi/keybindings.json" ~/.pi/agent/keybindings.json
-ln -sfn "$CONFIGS_DIR/pi/themes" ~/.pi/agent/themes
-ln -sfn "$CONFIGS_DIR/pi/prompts" ~/.pi/agent/prompts
-ln -sfn "$CONFIGS_DIR/pi/extensions" ~/.pi/agent/extensions
-ln -sfn "$CONFIGS_DIR/pi/agents" ~/.pi/agent/agents
+mkdir -p "$HOME/.pi/agent"
+link_item "$CONFIGS_DIR/pi/settings.json" "$HOME/.pi/agent/settings.json"
+link_item "$CONFIGS_DIR/pi/keybindings.json" "$HOME/.pi/agent/keybindings.json"
+link_item "$CONFIGS_DIR/pi/themes" "$HOME/.pi/agent/themes"
+link_item "$CONFIGS_DIR/pi/prompts" "$HOME/.pi/agent/prompts"
+link_item "$CONFIGS_DIR/pi/extensions" "$HOME/.pi/agent/extensions"
+link_item "$CONFIGS_DIR/pi/agents" "$HOME/.pi/agent/agents"
+
 npm install --omit=dev --ignore-scripts --no-audit --no-fund \
   --prefix "$CONFIGS_DIR/pi/extensions/web-tools"
-echo "  ~/.pi/agent/{settings,keybindings}.json -> $CONFIGS_DIR/pi/"
-echo "  ~/.pi/agent/{themes,prompts,extensions,agents} -> $CONFIGS_DIR/pi/"
 echo "  Installed Pi web-tools runtime dependencies"
 
 # Install TPM if not present
-if [ ! -d ~/.tmux/plugins/tpm ]; then
+if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
   echo "Installing TPM..."
-  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+  git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
   echo "  TPM installed. Open tmux and press prefix + I to install plugins."
 fi
 
