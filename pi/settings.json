@@ -1,7 +1,7 @@
 {
-  "lastChangelogVersion": "0.99.2",
+  "lastChangelogVersion": "1.5.0",
   "defaultProvider": "github-copilot",
-  "defaultModel": "gpt-5.6-sol",
+  "defaultModel": "claude-opus-5.5",
   "packages": [
     {
       "source": "npm:@plannotator/pi-extension",
@@ -11,9 +11,8 @@
   "theme": "dark",
   "hideThinkingBlock": false,
   "enabledModels": [
-    "github-copilot/claude-opus-4.6",
-    "github-copilot/gpt-5.6-sol",
-    "github-copilot/claude-opus-4.8"
+    "github-copilot/gpt-6.1-sol",
+    "github-copilot/claude-opus-5.5"
   ],
   "defaultThinkingLevel": "high"
 }
