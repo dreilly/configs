@@ -124,6 +124,24 @@
       "skillFolderHash": "b7015f17a49501e99642009ebadabcbefc0fbad0",
       "installedAt": "2026-06-30T14:24:48.946Z",
       "updatedAt": "2026-06-30T14:24:48.946Z"
+    },
+    "dex": {
+      "source": "dcramer/dex",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/dcramer/dex.git",
+      "skillPath": "plugins/dex/skills/dex/SKILL.md",
+      "skillFolderHash": "3ab3ddd273331aa9cfd2535da5cbbf66c0fb93e6",
+      "installedAt": "2026-10-30T02:22:14.054Z",
+      "updatedAt": "2026-10-30T02:22:14.054Z"
+    },
+    "dex-plan": {
+      "source": "dcramer/dex",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/dcramer/dex.git",
+      "skillPath": "plugins/dex/skills/dex-plan/SKILL.md",
+      "skillFolderHash": "598d87b643bbbf5329d6cf4139d26d443f078d05",
+      "installedAt": "2026-10-30T02:22:14.059Z",
+      "updatedAt": "2026-10-30T02:22:14.059Z"
     }
   },
   "dismissed": {
@@ -131,18 +149,18 @@
   },
   "lastSelectedAgents": [
     "amp",
-    "antigravity",
-    "antigravity-cli",
     "cline",
     "codex",
     "cursor",
-    "deepagents",
+    "droid",
+    "fx",
     "gemini-cli",
     "github-copilot",
+    "kilo",
     "kimi-code-cli",
     "opencode",
+    "pi",
     "warp",
-    "zed",
-    "claude-code"
+    "zed"
   ]
 }
