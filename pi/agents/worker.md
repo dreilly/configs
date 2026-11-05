@@ -1,7 +1,7 @@
 ---
 name: worker
 description: General implementation worker for a focused, approved task
-model: github-copilot/gpt-5.6-sol
+model: github-copilot/gpt-6.1-sol
 thinking: high
 tools: read, grep, find, ls, bash, edit, write, websearch, webfetch
 systemPromptMode: append
