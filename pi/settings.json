@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.99.2",
+  "lastChangelogVersion": "1.5.2",
   "defaultProvider": "github-copilot",
   "defaultModel": "gpt-5.6-sol",
   "packages": [
@@ -15,5 +15,9 @@
     "github-copilot/gpt-5.6-sol",
     "github-copilot/claude-opus-4.8"
   ],
-  "defaultThinkingLevel": "high"
+  "defaultThinkingLevel": "high",
+  "defaultTools": [
+    "+codemode"
+  ],
+  "deviceId": "e0ef25ea-62cf-4579-887c-159e765a883d"
 }

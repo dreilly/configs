@@ -24,6 +24,9 @@ link_item() {
   echo "  $dest -> $source"
 }
 
+# Zsh
+link_item "$CONFIGS_DIR/zsh/zshrc" "$HOME/.zshrc"
+
 # Neovim
 link_item "$CONFIGS_DIR/nvim" "$HOME/.config/nvim"
 
@@ -61,6 +64,7 @@ link_item "$CONFIGS_DIR/agents" "$HOME/.agents"
 mkdir -p "$HOME/.pi/agent"
 link_item "$CONFIGS_DIR/pi/settings.json" "$HOME/.pi/agent/settings.json"
 link_item "$CONFIGS_DIR/pi/keybindings.json" "$HOME/.pi/agent/keybindings.json"
+link_item "$CONFIGS_DIR/pi/mcp.json" "$HOME/.pi/agent/mcp.json"
 link_item "$CONFIGS_DIR/pi/themes" "$HOME/.pi/agent/themes"
 link_item "$CONFIGS_DIR/pi/prompts" "$HOME/.pi/agent/prompts"
 link_item "$CONFIGS_DIR/pi/extensions" "$HOME/.pi/agent/extensions"

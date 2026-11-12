@@ -1,0 +1,106 @@
+# History shared between shells.
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt extended_history hist_expire_dups_first hist_ignore_dups
+setopt hist_ignore_space hist_verify share_history
+
+# Shell conveniences.
+setopt auto_cd auto_pushd pushd_ignore_dups pushdminus
+setopt interactivecomments long_list_jobs
+unsetopt flowcontrol
+export PAGER="${PAGER:-less}"
+export LESS="${LESS:--R}"
+WORDCHARS=''
+
+# Native Zsh completion (including Homebrew completions when installed).
+# Drop completion paths inherited from an older Oh My Zsh shell.
+fpath=("${(@)fpath:#${HOME}/.oh-my-zsh/*}")
+typeset -U fpath
+for completion_dir in /opt/homebrew/share/zsh/site-functions /usr/local/share/zsh/site-functions; do
+  [[ ! -d "$completion_dir" || ${fpath[(Ie)$completion_dir]} -ne 0 ]] || fpath=("$completion_dir" $fpath)
+done
+unset completion_dir
+autoload -Uz compinit bashcompinit
+compinit -i
+bashcompinit
+zmodload zsh/complist
+setopt auto_menu complete_in_word always_to_end
+unsetopt menu_complete
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' special-dirs true
+zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
+
+# Emacs keys, prefix history search, and command-line editing.
+bindkey -e
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search edit-command-line
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+zle -N edit-command-line
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+zmodload zsh/terminfo
+[[ -z "${terminfo[kcuu1]}" ]] || bindkey "${terminfo[kcuu1]}" up-line-or-beginning-search
+[[ -z "${terminfo[kcud1]}" ]] || bindkey "${terminfo[kcud1]}" down-line-or-beginning-search
+[[ -z "${terminfo[khome]}" ]] || bindkey "${terminfo[khome]}" beginning-of-line
+[[ -z "${terminfo[kend]}" ]] || bindkey "${terminfo[kend]}" end-of-line
+bindkey '^[[3~' delete-char
+bindkey '^[[Z' reverse-menu-complete
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+bindkey '^[[3;5~' kill-word
+bindkey '^X^E' edit-command-line
+bindkey ' ' magic-space
+
+# Quote shell-special characters when typing/pasting URLs.
+autoload -Uz url-quote-magic bracketed-paste-magic
+zle -N self-insert url-quote-magic
+zle -N bracketed-paste bracketed-paste-magic
+
+# Familiar prompt: status arrow, current directory, Git branch + dirty marker.
+# Git commands are read-only; escape '%' in ref names for prompt expansion.
+_git_prompt_info() {
+  local ref git_status
+  ref=$(command git symbolic-ref --quiet --short HEAD 2>/dev/null) \
+    || ref=$(command git describe --tags --exact-match HEAD 2>/dev/null) \
+    || ref=$(command git rev-parse --short HEAD 2>/dev/null) \
+    || return 0
+  git_status=$(GIT_OPTIONAL_LOCKS=0 command git status --porcelain --ignore-submodules=dirty 2>/dev/null)
+  print -n -- "%B%F{blue}git:(%F{red}${ref//\%/%%}%F{blue})%b%f"
+  [[ -z "$git_status" ]] || print -n -- ' %F{yellow}✗%f'
+  print -n -- ' '
+}
+setopt prompt_subst
+PROMPT='%(?:%B%F{green}➜ :%B%F{red}➜ )%b%F{cyan}%c%f $(_git_prompt_info)'
+
+# Aliases used in saved history; no Git-plugin shortcuts.
+if [[ "$OSTYPE" == (darwin|freebsd)* ]]; then
+  export LSCOLORS='Gxfxcxdxbxegedabagacad'
+  alias ls='ls -G'
+else
+  alias ls='ls --color=auto'
+fi
+alias la='ls -lAh'
+alias grep='grep --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox,.venv,venv}'
+
+# NVM and its Bash-compatible completions.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+
+# Bun and completions.
+export BUN_INSTALL="$HOME/.bun"
+typeset -U path
+path=("$BUN_INSTALL/bin" $path)
+[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
+
+# fzf history/file/directory widgets and completion.
+[ -f "/opt/homebrew/opt/fzf/shell/key-bindings.zsh" ] && source "/opt/homebrew/opt/fzf/shell/key-bindings.zsh"
+[ -f "/opt/homebrew/opt/fzf/shell/completion.zsh" ] && source "/opt/homebrew/opt/fzf/shell/completion.zsh"
+
+# Rust and Cargo (installed by rustup).
+[[ ! -f "$HOME/.cargo/env" ]] || source "$HOME/.cargo/env"
+
+# Amp CLI
+export PATH="$HOME/.local/bin:$PATH"
