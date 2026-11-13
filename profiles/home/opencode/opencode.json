@@ -1,0 +1,12 @@
+{
+  "references": {
+    "hibber": {
+      "path": "~/code/hibber",
+      "description": "Use for Hibber project context, including application behavior, domain information, and implementation details."
+    },
+    "json_qa": {
+      "path": "~/code/json_qa",
+      "description": "Use for JSON QA project context, including application behavior, domain information, and implementation details."
+    }
+  }
+}

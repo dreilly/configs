@@ -23,7 +23,7 @@ The extension stores policy separately from externally managed skills:
 ~/.agents/skill-invocation.json
 ```
 
-The default file is tracked at `agents/skill-invocation.json` in the configs repo because `~/.agents` is symlinked there by `setup.sh`. Set `PI_SKILL_INVOCATION_CONFIG` to override the path.
+`setup.sh` seeds this machine-local file from `agents/skill-invocation.json` on first install. Later changes stay local; `~/.agents` is a real directory containing only the selected profile's skills. Set `PI_SKILL_INVOCATION_CONFIG` to override the path.
 
 Keys include Pi's source scope so a global and project skill with the same name can have different policies. Project keys also contain the absolute skill root to prevent same-named skills in separate projects from colliding:
 

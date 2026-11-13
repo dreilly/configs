@@ -5,7 +5,7 @@ Thin role-based delegation for Pi with two execution surfaces:
 - `headless` — a disposable isolated Pi process whose activity and final output stream inline.
 - `herdr` — a visible Pi session in a pane in the current Herdr tab, optionally reused.
 
-Roles are Markdown files under `~/.pi/agent/agents/` (symlinked to this repository's `agents/` directory). Frontmatter supports:
+Roles are Markdown files under `~/.pi/agent/agents/`. `setup.sh` links shared roles from `pi/agents/`, with selected-profile and machine-local roles taking precedence. Frontmatter supports:
 
 ```yaml
 ---
@@ -23,7 +23,7 @@ promptTemplates: false
 
 The Markdown body is the role's system prompt. `skills`, `contextFiles`, and `promptTemplates` default to `true`; set them to `false` to keep unnecessary discovered resources out of the child prompt.
 
-Local machine model overrides can be placed in `~/.pi/agent/agent-models.local.json` or `configs/pi/agent-models.local.json` (gitignored in this repo). Exact per-agent overrides win over frontmatter models; aliases are used only when the frontmatter model matches an alias key:
+Local machine model overrides belong in `~/.pi/agent/agent-models.local.json`. During migration, `setup.sh` copies `configs/pi/agent-models.local.json` there if no machine override already exists. Exact per-agent overrides win over frontmatter models; aliases are used only when the frontmatter model matches an alias key:
 
 ```json
 {
