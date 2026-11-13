@@ -1,3 +1,7 @@
+## Git guard
+
+- A `git-guard` extension asks me to confirm state-changing git commands. If it blocks one, do not retry it or work around it (different flags, `sh -c`, aliases, scripts). Say what you wanted to run and why, then wait.
+
 ## Databases
 
 I run all database changes myself. Local and worktree RealTime instances share the real remote SQL Server (`realitcustomers` and the district databases), so anything run against it affects shared data.

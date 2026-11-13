@@ -34,14 +34,14 @@ the installer does not copy provider logins between machines.
 
 ## What each profile loads
 
-**Both:** web-tools, role-agents, skill toggle, fuzzy file finder, Git guard, general Git
+**Both:** web-tools, role-agents, skill toggle, fuzzy file finder, general Git
 instructions, `/commit`, and shared skills from `~/.agents/skills/`.
 
 **Home only:** ordinary Chrome DevTools MCP and the home model selections. No Yaak,
-RealTime browser/worktree extensions, database guard, RealTime database instructions,
+RealTime browser/worktree extensions, Git guard, database guard, RealTime database instructions,
 `rt-tickets`, or `/commit-rt`.
 
-**Work only:** Yaak MCP, `rt-browser`, `/rtw`, database guard and RealTime database
+**Work only:** Yaak MCP, `rt-browser`, `/rtw`, Git guard, database guard and RealTime database
 instructions, `rt-tickets`, `/commit-rt`, and the work role overrides.
 
 For RealTime browser credentials and the local worktree/container prerequisites, read the

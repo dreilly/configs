@@ -40,14 +40,14 @@ also requires a new shell to stop using home-only shell settings.
 ## What loads
 
 **Shared:** Neovim, tmux, WezTerm, i3/i3status, Herdr, base Ghostty and OpenCode config;
-Pi web-tools, role-agents, skill toggle, fuzzy file finder, Git guard and general Git
+Pi web-tools, role-agents, skill toggle, fuzzy file finder, and general Git
 instructions; general `/commit` prompts; shared skills including `dex` and `dex-plan`.
 
 **Home:** OpenAI Codex Pi model defaults, home roles, ordinary Chrome DevTools MCP,
 Hibber/JSON QA OpenCode references, and the managed Zsh configuration.
 
 **Work:** the `rt-harn` Pi model defaults and role overrides, RealTime browser/worktree
-extensions (`rt-browser`, `/rtw`), Yaak MCP, database guard and instructions, `rt-tickets`,
+extensions (`rt-browser`, `/rtw`), Yaak MCP, Git guard, database guard and instructions, `rt-tickets`,
 `/commit-rt`, OpenCode's `/open-realtime` and RealTime repository references, and Ghostty
 font size 15. Work leaves an existing, unmanaged `.zshrc` alone, matching the old work
 branch. If switching from a managed home `.zshrc`, that managed file is removed; an older
